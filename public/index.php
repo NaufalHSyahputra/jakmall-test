@@ -22,6 +22,10 @@ $router
     ->namespace('Jakmall\Recruitment\Calculator\Http\Controller')
     ->group(
         function (\Illuminate\Routing\Router $router) {
+            $router->get('/', 'HistoryController@index');
+            $router->get('/{id}', 'HistoryController@show');
+            $router->delete('/{id}', 'HistoryController@remove');
+            $router->post('/{action}', 'CalculatorController@calculate');
         }
     )
 ;
