@@ -5,7 +5,7 @@ namespace Jakmall\Recruitment\Calculator\Commands;
 use Illuminate\Console\Command;
 use Jakmall\Recruitment\Calculator\Libraries\Calculator;
 
-class AddCommand extends Command
+class PowerCommand extends Command
 {
     /**
      * @var string
@@ -32,12 +32,12 @@ class AddCommand extends Command
 
     protected function getCommandVerb(): string
     {
-        return 'add';
+        return 'power';
     }
 
     protected function getCommandPassiveVerb(): string
     {
-        return 'added';
+        return 'power';
     }
 
     public function handle(): void
@@ -67,6 +67,6 @@ class AddCommand extends Command
 
     protected function getOperator(): string
     {
-        return '+';
+        return '^';
     }
 }
