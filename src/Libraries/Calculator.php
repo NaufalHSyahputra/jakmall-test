@@ -71,7 +71,7 @@ class Calculator
         $number = array_pop($numbers);
 
         if (count($numbers) <= 0) {
-            return $number;
+            return (int)$number;
         }
 
         return $this->calculate($this->calculateAll($numbers), $number, $this->getOperator());
@@ -87,19 +87,19 @@ class Calculator
     {
         switch ($operator) {
             case '-':
-                return $number1 - $number2;
+                return (int)$number1 - (int)$number2;
                 break;
             case '*':
-                return $number1 * $number2;
+                return (int)$number1 * (int)$number2;
                 break;
             case '/':
-                return $number1 / $number2;
+                return (int)$number1 / (int)$number2;
                 break;
             case '^':
-                return $number1 ** $number2;
+                return (int)$number1 ** (int)$number2;
                 break;
             default:
-                return $number1 + $number2;
+                return (int)$number1 + (int)$number2;
                 break;
         }
     }
