@@ -96,7 +96,7 @@ class Calculator
                 return $number1 / $number2;
                 break;
             case '^':
-                return $number1 ^ $number2;
+                return $number1 ** $number2;
                 break;
             default:
                 return $number1 + $number2;
