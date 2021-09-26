@@ -3,8 +3,8 @@
 namespace Jakmall\Recruitment\Calculator\Commands;
 
 use Illuminate\Console\Command;
+use Jakmall\Recruitment\Calculator\Calculator\Infrastructure\CalculatorManagerInterface;
 use Jakmall\Recruitment\Calculator\History\Infrastructure\CommandHistoryManagerInterface;
-use Jakmall\Recruitment\Calculator\Libraries\Calculator;
 
 class DivideCommand extends Command
 {
@@ -20,7 +20,9 @@ class DivideCommand extends Command
 
     protected $log;
 
-    public function __construct(CommandHistoryManagerInterface $log)
+    protected $calculate;
+
+    public function __construct(CommandHistoryManagerInterface $log, CalculatorManagerInterface $calculate)
     {
         $commandVerb = $this->getCommandVerb();
 
@@ -31,6 +33,7 @@ class DivideCommand extends Command
         );
         $this->description = sprintf('%s all given Numbers', ucfirst($commandVerb));
         $this->log = $log;
+        $this->calculate = $calculate;
         parent::__construct();
     }
 
@@ -47,18 +50,8 @@ class DivideCommand extends Command
     public function handle(): void
     {
         $numbers = $this->getInput();
-        
-        $calculator = new Calculator();
-        $calculator->setNumbers($numbers);
-        $calculator->setOperator($this->getOperator());
-        $result = $calculator->calculateAll($numbers);
-        
-        $description = $this->generateCalculationDescription($numbers);
-        
-        $this->log->setDriver($this->getDriver());
-        $this->log->log(sprintf("%s|%s", ucfirst($this->getCommandVerb()), sprintf('%s=%s', $description, $result)));
-
-        $this->comment(sprintf('%s = %s', $description, $result));
+        $return = $this->calculate->calculate($numbers, $this->getOperator(), $this->getDriver(), $this->getCommandVerb());
+        $this->comment(sprintf('%s = %s', $return['operation'], $return['result']));
     }
 
     protected function getInput(): array
@@ -69,14 +62,6 @@ class DivideCommand extends Command
     protected function getDriver(): string
     {
         return $this->option('driver');
-    }
-
-    protected function generateCalculationDescription(array $numbers): string
-    {
-        $operator = $this->getOperator();
-        $glue = sprintf(' %s ', $operator);
-
-        return implode($glue, $numbers);
     }
 
     protected function getOperator(): string

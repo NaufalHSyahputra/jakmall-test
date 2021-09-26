@@ -3,23 +3,60 @@
 namespace Jakmall\Recruitment\Calculator\Http\Controller;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Jakmall\Recruitment\Calculator\History\Infrastructure\CommandHistoryManagerInterface;
 
 class HistoryController
 {
-    public function index()
+    private $log;
+    public function __construct(CommandHistoryManagerInterface $log)
     {
-        // todo: modify codes to get history
-        dd('create history logic here');
+        $this->log = $log;
+    }
+    public function index(Request $request)
+    {
+        $this->log->setDriver($request->query('driver', 'composite'));
+        $arrays = $this->log->findAll();
+        if (count($arrays) <= 0) { 
+            return Response::create([], Response::HTTP_OK);
+        }
+        $arrays = array_map(function ($el) { 
+            preg_match_all('!\d+!', $el['operation'], $matches);
+            return [
+                'id' => $el['id'],
+                'command' => $el['command'],
+                'operation' => $el['operation'],
+                'input' => $matches[0],
+                'result' => $el['result']
+            ];
+        }, $arrays);
+        return Response::create($arrays, Response::HTTP_OK);
     }
 
-    public function show()
+    public function show(Request $request, string $id)
     {
-        dd('create show history by id here');
+        $this->log->setDriver($request->query('driver', 'composite'));
+        $arrays = $this->log->find($id);
+        if (count($arrays) <= 0) { 
+            return Response::create([], Response::HTTP_OK);
+        }
+        $arrays = array_map(function ($el) { 
+            preg_match_all('!\d+!', $el['operation'], $matches);
+            return [
+                'id' => $el['id'],
+                'command' => $el['command'],
+                'operation' => $el['operation'],
+                'input' => $matches[0],
+                'result' => $el['result']
+            ];
+        }, $arrays);
+        return Response::create($arrays, Response::HTTP_OK);
     }
 
-    public function remove()
+    public function remove(string $id)
     {
-        // todo: modify codes to remove history
-        dd('create remove history logic here');
+        $this->log->setDriver('composite');
+        $this->log->clear($id);
+        return Response::create([], Response::HTTP_NO_CONTENT);
     }
 }
