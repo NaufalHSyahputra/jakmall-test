@@ -10,6 +10,13 @@ interface CommandHistoryManagerInterface
      *
      * @return array returns an array of commands in storage
      */
+    public function setDriver($driver): void;
+
+    /**
+     * Returns array of command history.
+     *
+     * @return array returns an array of commands in storage
+     */
     public function findAll(): array;
 
     /**
