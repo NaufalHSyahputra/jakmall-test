@@ -48,10 +48,15 @@ class LatestDriver
     public function write($content, $command): bool
     {
         $log_array = $this->file->readToArray();
-        $latest_id = max(array_column(array_map(function ($el) {
+        $new_arrays = array_map(function ($el) { 
             $el = explode("|", $el);
-            return ['id' => $el[0]];
-        }, $log_array), 'id'));
+            return ['id' => (int)$el[0], 'text' => "|{$el[1]}|{$el[2]}"];
+        }, $this->file->readToArray());
+        $duplicate_key = $this->findDuplicate($new_arrays, $content, $command);
+        if ($duplicate_key !== -1 && $duplicate_key !== count($log_array)-1) { 
+            unset($log_array[$duplicate_key]);
+        }
+        $latest_id = max(array_column($new_arrays, 'id'));
         $log = $latest_id + 1;
         $log .= "|$command";
         $log .= "|$content";
@@ -60,6 +65,19 @@ class LatestDriver
             array_pop($log_array);
         }
         return $this->file->write(implode(PHP_EOL, $log_array));
+    }
+
+    private function findDuplicate($new_arrays, $content, $command): int { 
+        $log = "|$command";
+        $log .= "|$content";
+        $found = -1;
+        foreach ($new_arrays as $i => $array) { 
+            if ($array['text'] === $log) { 
+                $found = $i;
+                break;
+            }
+        }
+        return $found;
     }
 
     public function clearAll(): bool
